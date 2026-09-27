@@ -42,9 +42,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(VitalSign::class, 'recorded_by');
     }
-
-    public function triageReviews(): HasMany
-    {
-        return $this->hasMany(TriageResult::class, 'reviewed_by');
-    }
 }

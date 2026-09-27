@@ -339,12 +339,6 @@
             </div>
 
             @forelse($student->clinicVisits as $visit)
-                @php
-                    $triageLevel =
-                        $visit->triageResult?->final_triage_level
-                        ?? $visit->triageResult?->ai_triage_level;
-                @endphp
-
                 <a href="{{ route('clinic-visits.show', $visit) }}"
                    class="mt-4 flex flex-col gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50 sm:flex-row sm:items-center sm:justify-between">
 
@@ -367,18 +361,6 @@
                                 {{ ucwords(str_replace('_', ' ', $visit->status)) }}
                             </span>
 
-                            @if($triageLevel)
-                                <span class="rounded-full px-3 py-1 text-xs font-semibold
-                                    @if($triageLevel === 'red')
-                                        bg-red-100 text-red-700
-                                    @elseif($triageLevel === 'yellow')
-                                        bg-amber-100 text-amber-700
-                                    @else
-                                        bg-emerald-100 text-emerald-700
-                                    @endif">
-                                    {{ ucfirst($triageLevel) }} Triage
-                                </span>
-                            @endif
                         </div>
 
                         <p class="mt-2 text-sm text-slate-500">

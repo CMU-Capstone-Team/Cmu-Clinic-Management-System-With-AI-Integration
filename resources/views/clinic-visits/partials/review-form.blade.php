@@ -52,67 +52,7 @@
                            focus:outline-none focus:ring-2
                            focus:ring-blue-100"
                     placeholder="Enter the clinic staff's final assessment..."
-                >{{ old('final_assessment',
-                    $clinicVisit->triageResult?->ai_summary
-) }}</textarea>
-            </div>
-
-            <div>
-                <label
-                    for="final_triage_level"
-                    class="mb-2 block font-semibold text-slate-700"
-                >
-                    Final Triage Level
-                    <span class="text-red-500">*</span>
-                </label>
-
-                <select
-                    id="final_triage_level"
-                    name="final_triage_level"
-                    required
-                    class="w-full rounded-xl border border-slate-300
-                           bg-white px-4 py-3 focus:border-blue-700
-                           focus:outline-none focus:ring-2
-                           focus:ring-blue-100"
-                >
-                    <option value="">Select triage level</option>
-
-                    <option
-                        value="green"
-                        @selected(
-                            old(
-                                'final_triage_level',
-                                $clinicVisit->triageResult?->ai_triage_level
-                            ) === 'green'
-                        )
-                    >
-                        Green — Mild or non-urgent
-                    </option>
-
-                    <option
-                        value="yellow"
-                        @selected(
-                            old(
-                                'final_triage_level',
-                                $clinicVisit->triageResult?->ai_triage_level
-                                ) === 'yellow'
-                            )
-                    >
-                        Yellow — Needs prompt assessment
-                    </option>
-
-                    <option
-                        value="red"
-                        @selected(
-                            old(
-                                'final_triage_level',
-                                $clinicVisit->triageResult?->ai_triage_level
-                            ) === 'red'
-                        )
-                    >
-                        Red — Urgent or emergency
-                    </option>
-                </select>
+                >{{ old('final_assessment') }}</textarea>
             </div>
 
             <div>
@@ -163,35 +103,10 @@
 
             <div>
                 <label
-                    for="final_recommendation"
-                    class="mb-2 block font-semibold text-slate-700"
-                >
-                    Final Care Recommendation
-                    <span class="text-red-500">*</span>
-                </label>
-
-                <textarea
-                    id="final_recommendation"
-                    name="final_recommendation"
-                    rows="3"
-                    required
-                    class="w-full rounded-xl border border-slate-300
-                           px-4 py-3 focus:border-blue-700
-                           focus:outline-none focus:ring-2
-                           focus:ring-blue-100"
-                    placeholder="Enter staff-approved care instructions..."
-                >{{ old(
-                    'final_recommendation',
-                    $clinicVisit->triageResult?->ai_recommendations
-            ) }}</textarea>
-            </div>
-
-            <div>
-                <label
                     for="final_notes"
                     class="mb-2 block font-semibold text-slate-700"
                 >
-                    Additional Notes
+                    Care Provided, Instructions, and Notes
                 </label>
 
                 <textarea
@@ -202,7 +117,8 @@
                            px-4 py-3 focus:border-blue-700
                            focus:outline-none focus:ring-2
                            focus:ring-blue-100"
-                    placeholder="Optional additional notes..."
+                    placeholder="Record care provided, instructions, and any additional notes..."
+                    maxlength="5000"
                 >{{ old('final_notes') }}</textarea>
             </div>
 
@@ -221,7 +137,7 @@
                     name="guardian_contacted"
                     value="1"
                     class="h-4 w-4"
-                    @checked(old('guardian_contacted'))
+                    @checked(old('guardian_contacted', $clinicVisit->guardian_contacted))
                 >
 
                 <span class="text-sm font-medium text-slate-700">
@@ -257,6 +173,16 @@
                 <p class="mt-1 text-slate-600">
                     {{ $clinicVisit->final_assessment }}
                 </p>
+
+                @if($clinicVisit->final_action)
+                    <p class="mt-3 text-sm text-slate-600">
+                        Action: {{ ucwords(str_replace('_', ' ', $clinicVisit->final_action)) }}
+                    </p>
+                @endif
+
+                @if($clinicVisit->final_notes)
+                    <p class="mt-3 whitespace-pre-line text-sm text-slate-600">{{ $clinicVisit->final_notes }}</p>
+                @endif
             </div>
 
             <span

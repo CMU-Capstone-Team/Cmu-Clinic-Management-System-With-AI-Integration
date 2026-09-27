@@ -6,7 +6,6 @@
     @php
         $student = $clinicVisit->student;
         $vitals = $clinicVisit->vitalSign;
-        $triage = $clinicVisit->triageResult;
         $display = fn ($value) => filled($value) ? $value : 'Not recorded';
     @endphp
 
@@ -172,7 +171,6 @@
                 </div>
             </div>
         </section>
-        @include('clinic-visits.partials.ai-triage')
         @include('clinic-visits.partials.review-form')
     </div>
 @endsection

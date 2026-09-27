@@ -6,13 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable; // ✅ IDAGDAG ITO PARA MAKAPAG-LOGIN ANG STUDENT
 
-class Student extends Model
+class Student extends Authenticatable // ✅ BAGUHIN MULA 'Model' PAPUNTA 'Authenticatable'
 {
     use HasFactory;
 
     protected $fillable = [
         'student_number',
+        'name',          // ✅ IDAGDAG (Base sa migration)
+        'full_name',     // ✅ IDAGDAG (Base sa migration)
+        'email',
+        'password',      // ✅ IDAGDAG (Kailangan para sa login/auth)
+        'status',        // ✅ PINAKA-IMPORTANT: Para sa pending/active/rejected workflow
+        
+        // Existing fields mo
         'first_name',
         'middle_name',
         'last_name',
@@ -23,7 +31,6 @@ class Student extends Model
         'year_level',
         'section',
         'contact_number',
-        'email',
         'address',
         'emergency_contact_name',
         'emergency_contact_relationship',
@@ -31,12 +38,18 @@ class Student extends Model
         'is_active',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+    
     protected function casts(): array
     {
         return [
             'birth_date' => 'date',
             'year_level' => 'integer',
             'is_active' => 'boolean',
+            'email_verified_at' => 'datetime',
         ];
     }
 
@@ -45,6 +58,12 @@ class Student extends Model
         return $this->hasOne(MedicalProfile::class);
     }
 
+    public function clinicVisits(): HasMany
+    {
+        return $this->hasMany(ClinicVisit::class);
+    }
+
+    // Accessor for full name (Optional, kung gusto mong i-combine ang first/middle/last)
     public function getFullNameAttribute(): string
     {
         return collect([
@@ -54,13 +73,4 @@ class Student extends Model
             $this->suffix,
         ])->filter()->implode(' ');
     }
-    public function clinicVisits(): HasMany
-{
-    return $this->hasMany(ClinicVisit::class);
 }
-
-public function checkIns(): HasMany
-{
-    return $this->hasMany(StudentCheckIn::class, 'student_id');
-}
-} 

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Services\LocalAiTriageService;
 use App\Http\Requests\ReviewClinicVisitRequest;
 use App\Http\Requests\StoreClinicVisitRequest;
 use App\Models\ClinicVisit;
@@ -43,7 +42,6 @@ class ClinicVisitController extends Controller
             ->with([
                 'student',
                 'attendingStaff',
-                'triageResult',
             ])
             ->when($search !== '', function ($query) use ($search) {
                 $searchTerm = "%{$search}%";
@@ -261,14 +259,6 @@ class ClinicVisitController extends Controller
                 );
             }
 
-            /*
-             * Create an empty triage record that will later
-             * receive the AI summary and staff final decision.
-             */
-            $visit->triageResult()->create([
-                'review_status' => 'pending',
-            ]);
-
             return $visit;
         });
 
@@ -288,53 +278,11 @@ class ClinicVisitController extends Controller
             'student.medicalProfile',
             'attendingStaff',
             'vitalSign.recordedBy',
-            'triageResult.reviewer',
         ]);
 
         return view(
             'clinic-visits.show',
             compact('clinicVisit')
-        );
-    }
-
-    public function generateAi(
-        ClinicVisit $clinicVisit,
-        LocalAiTriageService $aiService
-    ): RedirectResponse {
-        if ($clinicVisit->status !== 'in_progress') {
-            return back()->with(
-                'error',
-                'AI triage cannot be generated because this visit has already been finalized.'
-            );
-        }
-
-        $result = $aiService->generate(
-            $clinicVisit
-        );
-
-        $usedFallback = (bool) (
-            $result['used_fallback'] ?? false
-        );
-
-        unset($result['used_fallback']);
-
-        $clinicVisit
-            ->triageResult()
-            ->updateOrCreate(
-                [],
-                $result
-            );
-
-        $message = $usedFallback
-            ? 'Ollama was unavailable, so a rule-based fallback summary was generated.'
-            : 'Local AI summary and triage suggestion generated successfully.';
-
-        return to_route(
-            'clinic-visits.show',
-            $clinicVisit
-        )->with(
-            'success',
-            $message
         );
     }
 
@@ -391,49 +339,6 @@ class ClinicVisitController extends Controller
                 'completed_at' =>
                     now(),
             ]);
-
-            /*
-             * Check whether an AI result already exists.
-             */
-            $hasAiResult = filled(
-                $clinicVisit
-                    ->triageResult
-                    ?->ai_summary
-            );
-
-            /*
-             * Save the staff's final triage and recommendation.
-             */
-            $clinicVisit
-                ->triageResult()
-                ->updateOrCreate(
-                    [],
-                    [
-                        'final_triage_level' =>
-                            $validated['final_triage_level'],
-
-                        'final_recommendation' =>
-                            $validated['final_recommendation'],
-
-                        'reviewer_notes' =>
-                            $validated['final_notes'] ?? null,
-
-                        'reviewed_by' =>
-                            auth()->id(),
-
-                        'reviewed_at' =>
-                            now(),
-
-                        /*
-                         * If AI exists, the human-entered result
-                         * is treated as a modification.
-                         */
-                        'review_status' =>
-                            $hasAiResult
-                                ? 'modified'
-                                : 'approved',
-                    ]
-                );
         });
 
         $message = $newStatus === 'referred'
