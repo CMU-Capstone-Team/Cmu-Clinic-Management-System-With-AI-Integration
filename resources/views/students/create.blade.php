@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Register Student | CMU ClinicAssist AI')
+@section('title', 'Register Student | CMU Alaga')
 
 @section('content')
     @php
