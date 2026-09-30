@@ -6,7 +6,6 @@
 
     <title>@yield('title', 'CMU Alaga')</title>
     
-
     <script>
         // Restore sidebar state BEFORE the body is rendered
         try {
@@ -72,7 +71,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            width: 232px; /* Fixed width to prevent shifting */
+            width: 232px;
             height: 48px;
             gap: 14px;
         }
@@ -308,9 +307,7 @@
                     </div>
                     <div class="logo-text">
                         <h1>CMU Alaga</h1>
-                    <p class="mt-1 text-slate-500">Clinic Management
-
-                    </p>
+                        <p class="mt-1 text-slate-500">Clinic Management</p>
                     </div>
                 </div>
             </div>
@@ -364,27 +361,41 @@
                 </div>
             </nav>
 
-            {{-- User Section --}}
+            {{-- User Section (FIXED FOR GUEST USERS) --}}
             <div class="user-section">
-                <div class="user-info">
-                    <div class="user-avatar" aria-hidden="true">
-                        {{ substr(auth()->user()->name, 0, 1) }}
+                @if(auth()->check())
+                    <div class="user-info">
+                        <div class="user-avatar" aria-hidden="true">
+                            {{ substr(auth()->user()->name ?? 'G', 0, 1) }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ auth()->user()->name }}</div>
+                            <div class="user-role">{{ ucfirst(auth()->user()->role ?? 'User') }}</div>
+                        </div>
                     </div>
-                    <div class="user-details">
-                        <div class="user-name">{{ auth()->user()->name }}</div>
-                        <div class="user-role">{{ ucfirst(auth()->user()->role) }}</div>
-                    </div>
-                </div>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="logout-btn" aria-label="Log out">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        <span>Log out</span>
-                    </button>
-                </form>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="logout-btn" aria-label="Log out">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>Log out</span>
+                        </button>
+                    </form>
+                @else
+                    {{-- Guest View: Show Login Link instead of Logout --}}
+                    <div class="user-info">
+                        <div class="user-avatar" aria-hidden="true">G</div>
+                        <div class="user-details">
+                            <div class="user-name">Guest</div>
+                            <div class="user-role">Visitor</div>
+                        </div>
+                    </div>
+                    <a href="{{ route('login') }}" class="logout-btn" style="text-decoration: none; justify-content: center;">
+                        <span>Sign In</span>
+                    </a>
+                @endif
             </div>
         </aside>
 
@@ -401,18 +412,22 @@
                         </div>
                     </div>
 
-                    <details class="relative">
-                        <summary class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">Menu</summary>
-                        <div class="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
-                            <a aria-label="Dashboard" href="{{ route('dashboard') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Dashboard</a>
-                            <a aria-label="Manage Students" href="{{ route('students.index') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Manage Students</a>
-                            <a aria-label="Clinic Visits" href="{{ route('clinic-visits.index') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Clinic Visits</a>
-                            <form method="POST" action="{{ route('logout') }}" class="mt-2 border-t border-slate-200 pt-2">
-                                @csrf
-                                <button type="submit" class="w-full rounded-lg px-4 py-3 text-left text-sm font-semibold text-red-600 hover:bg-red-50">Log out</button>
-                            </form>
-                        </div>
-                    </details>
+                    @if(auth()->check())
+                        <details class="relative">
+                            <summary class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">Menu</summary>
+                            <div class="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+                                <a aria-label="Dashboard" href="{{ route('dashboard') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Dashboard</a>
+                                <a aria-label="Manage Students" href="{{ route('students.index') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Manage Students</a>
+                                <a aria-label="Clinic Visits" href="{{ route('clinic-visits.index') }}" class="block rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">Clinic Visits</a>
+                                <form method="POST" action="{{ route('logout') }}" class="mt-2 border-t border-slate-200 pt-2">
+                                    @csrf
+                                    <button type="submit" class="w-full rounded-lg px-4 py-3 text-left text-sm font-semibold text-red-600 hover:bg-red-50">Log out</button>
+                                </form>
+                            </div>
+                        </details>
+                    @else
+                        <a href="{{ route('login') }}" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">Sign In</a>
+                    @endif
                 </div>
             </header>
 
