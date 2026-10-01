@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class ClinicVisit extends Model
 {
     protected $fillable = [
-        'student_check_in_id',
         'visit_number',
         'student_id',
         'attended_by',
@@ -58,19 +57,8 @@ class ClinicVisit extends Model
         return $this->hasOne(VitalSign::class);
     }
 
-    public function triageResult(): HasOne
-    {
-        return $this->hasOne(TriageResult::class);
-    }
-        public function medicalExcuse(): HasOne
+    public function medicalExcuse(): HasOne
     {
         return $this->hasOne(MedicalExcuse::class);
-    }
-    public function studentCheckIn(): BelongsTo
-    {
-        return $this->belongsTo(
-            StudentCheckIn::class,
-            'student_check_in_id'
-        );
     }
 }

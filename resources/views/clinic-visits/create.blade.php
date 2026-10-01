@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'New Clinic Visit | CMU ClinicAssist AI')
+@section('title', 'New Clinic Visit | CMU Alaga')
 
 @section('content')
     @php
@@ -377,8 +377,8 @@
                             </label>
 
                             <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                                Saving creates an in-progress visit. The AI result
-                                and final clinical decision will be reviewed separately.
+                                Saving creates an in-progress visit. Clinic staff will
+                                record the assessment and final action separately.
                             </div>
                         </div>
                     </section>

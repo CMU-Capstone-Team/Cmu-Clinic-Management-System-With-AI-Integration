@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Clinic Visit Logbook | CMU ClinicAssist AI')
+@section('title', 'Clinic Visit Logbook | CMU Alaga')
 
 @section('content')
     <div class="mx-auto space-y-6" style="max-width: 1600px;">
@@ -159,22 +159,12 @@
                                 Status
                             </th>
 
-                            <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
-                                Triage
-                            </th>
-
                             <th class="px-5 py-4"></th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100">
                         @forelse($visits as $visit)
-                            @php
-                                $triageLevel =
-                                    $visit->triageResult?->final_triage_level
-                                    ?? $visit->triageResult?->ai_triage_level;
-                            @endphp
-
                             <tr class="hover:bg-slate-50">
                                 <td class="whitespace-nowrap px-5 py-4">
                                     <p class="font-semibold text-slate-900">
@@ -237,25 +227,6 @@
                                     </span>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    @if($triageLevel)
-                                        <span class="rounded-full px-3 py-1 text-xs font-semibold
-                                            @if($triageLevel === 'red')
-                                                bg-red-100 text-red-700
-                                            @elseif($triageLevel === 'yellow')
-                                                bg-amber-100 text-amber-700
-                                            @else
-                                                bg-emerald-100 text-emerald-700
-                                            @endif">
-                                            {{ ucfirst($triageLevel) }}
-                                        </span>
-                                    @else
-                                        <span class="text-sm text-slate-400">
-                                            Pending
-                                        </span>
-                                    @endif
-                                </td>
-
                                 <td class="whitespace-nowrap px-5 py-4 text-right">
                                     <a href="{{ route('clinic-visits.show', $visit) }}"
                                        class="font-semibold text-blue-700 hover:underline">
@@ -265,7 +236,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-16 text-center">
+                                <td colspan="6" class="px-6 py-16 text-center">
                                     <p class="font-semibold text-slate-600">
                                         No clinic visits found.
                                     </p>
