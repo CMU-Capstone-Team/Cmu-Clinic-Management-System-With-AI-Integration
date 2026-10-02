@@ -30,13 +30,12 @@ class RegisterController extends Controller
 
         // 2. Create Student with PENDING Status
         Student::create([
-            'name' => $validated['name'],
-            // Kung walang full_name, gamitin ang 'name' bilang fallback para iwas NULL error
             'full_name' => $validated['full_name'] ?? $validated['name'],
             'student_number' => $validated['student_number'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'status' => 'pending', // <--- AUTOMATICALLY PENDING
+            'status' => 'pending',
+            'is_active' => false,
         ]);
 
         // 3. Redirect to Status Page (HINDI NA DIRECT LOGIN)

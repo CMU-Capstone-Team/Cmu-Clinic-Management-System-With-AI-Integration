@@ -14,7 +14,6 @@ class Student extends Authenticatable // ✅ BAGUHIN MULA 'Model' PAPUNTA 'Authe
 
     protected $fillable = [
         'student_number',
-        'name',          // ✅ IDAGDAG (Base sa migration)
         'full_name',     // ✅ IDAGDAG (Base sa migration)
         'email',
         'password',      // ✅ IDAGDAG (Kailangan para sa login/auth)
@@ -64,13 +63,17 @@ class Student extends Authenticatable // ✅ BAGUHIN MULA 'Model' PAPUNTA 'Authe
     }
 
     // Accessor for full name (Optional, kung gusto mong i-combine ang first/middle/last)
-    public function getFullNameAttribute(): string
+    public function getFullNameAttribute($value): string
     {
-        return collect([
-            $this->first_name,
-            $this->middle_name,
-            $this->last_name,
-            $this->suffix,
-        ])->filter()->implode(' ');
+    if (filled($value)) {
+        return $value;
+    }
+
+    return collect([
+        $this->first_name,
+        $this->middle_name,
+        $this->last_name,
+        $this->suffix,
+    ])->filter()->implode(' ');
     }
 }

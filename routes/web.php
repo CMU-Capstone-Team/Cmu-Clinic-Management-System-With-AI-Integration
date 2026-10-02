@@ -27,23 +27,42 @@ Route::middleware('guest')->group(function (): void {
 });
 
 // ============================================================================
-// STUDENT PORTAL ROUTES (Protected by 'student' Guard ONLY)
+// STUDENT PORTAL ROUTES
 // ============================================================================
 Route::middleware('auth:student')->group(function (): void {
-    
-    // Student Dashboard
     Route::get('/student/dashboard', function () {
-        return view('students.dashboard'); 
+    return redirect()->route('student.profile');
     })->name('student.dashboard');
 
-    // Student Portal Pages
-    Route::get('/student/profile', [PortalController::class, 'profile'])->name('student.profile');
-    Route::get('/student/visits', [PortalController::class, 'visits'])->name('student.visits');
-    Route::get('/student/records', [PortalController::class, 'records'])->name('student.records');
+    Route::get('/student/profile', [PortalController::class, 'profile'])
+        ->name('student.profile');
 
-    // Student Status Check
+    Route::patch('/student/profile/email', [PortalController::class, 'updateEmail'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.email');
+
+    Route::patch('/student/profile/password', [PortalController::class, 'updatePassword'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.password');
+
+    Route::post('/student/logout', [PortalController::class, 'logout'])
+        ->name('student.logout');
+
+    Route::get('/student/visits', [PortalController::class, 'visits'])
+        ->name('student.visits');
+
+    Route::get('/student/records', [PortalController::class, 'records'])
+        ->name('student.records');
+
     Route::get('/student/status', [PortalController::class, 'checkStatus'])
         ->name('student.status');
+
+    Route::patch('/student/profile/photo', [PortalController::class, 'updatePhoto'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.photo');
+
+    Route::get('/student/profile/photo', [PortalController::class, 'photo'])
+        ->name('student.profile.photo.show');
 });
 
 // ============================================================================
