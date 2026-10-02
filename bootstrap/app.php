@@ -11,7 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // ✅ Iwas CSRF verification para sa pre-registration form (Testing lang)
+        $middleware->validateCsrfTokens(except: [
+            'pre-register',
+            'login',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

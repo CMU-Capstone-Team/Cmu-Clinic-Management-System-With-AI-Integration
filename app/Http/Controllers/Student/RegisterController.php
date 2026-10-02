@@ -13,7 +13,7 @@ class RegisterController extends Controller
     // Ipakita ang Pre-Registration Form
     public function create()
     {
-        return view('student.pre-register'); 
+        return view('students.pre-register'); // May 's' para tumugma sa folder name
     }
 
     // Process ng Registration
@@ -26,23 +26,20 @@ class RegisterController extends Controller
             'student_number' => ['required', 'string', 'unique:students,student_number'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:students,email'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            
-            // Optional: I-validate din yung ibang fields kung required sa form mo
-            // 'first_name' => 'required|string|max:255',
-            // 'last_name' => 'required|string|max:255',
         ]);
 
         // 2. Create Student with PENDING Status
         Student::create([
-            'name' => $validated['name'],
-            'full_name' => $validated['full_name'] ?? null,
+            'full_name' => $validated['full_name'] ?? $validated['name'],
             'student_number' => $validated['student_number'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'status' => 'pending', // <--- AUTOMATICALLY PENDING
+            'status' => 'pending',
+            'is_active' => false,
         ]);
 
-        // 3. Redirect with Success Message
-        return redirect()->route('login')->with('success', 'Registration successful! Your account is pending admin approval.');
+        // 3. Redirect to Status Page (HINDI NA DIRECT LOGIN)
+        return redirect()->route('student.status')
+            ->with('success', 'Registration successful! Please wait for admin approval.');
     }
 }

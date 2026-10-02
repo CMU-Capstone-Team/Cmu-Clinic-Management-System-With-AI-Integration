@@ -9,6 +9,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
+// ============================================================================
+// ROOT REDIRECT
+// ============================================================================
 Route::redirect('/', '/login');
 
 // ============================================================================
@@ -24,13 +27,51 @@ Route::middleware('guest')->group(function (): void {
 });
 
 // ============================================================================
-// AUTHENTICATED ROUTES (Kailangan ng Login)
-// PINAGSAMA NA LAHAT DITO PARA IWAS DUPLICATE
+// STUDENT PORTAL ROUTES
+// ============================================================================
+Route::middleware('auth:student')->group(function (): void {
+    Route::get('/student/dashboard', function () {
+    return redirect()->route('student.profile');
+    })->name('student.dashboard');
+
+    Route::get('/student/profile', [PortalController::class, 'profile'])
+        ->name('student.profile');
+
+    Route::patch('/student/profile/email', [PortalController::class, 'updateEmail'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.email');
+
+    Route::patch('/student/profile/password', [PortalController::class, 'updatePassword'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.password');
+
+    Route::post('/student/logout', [PortalController::class, 'logout'])
+        ->name('student.logout');
+
+    Route::get('/student/visits', [PortalController::class, 'visits'])
+        ->name('student.visits');
+
+    Route::get('/student/records', [PortalController::class, 'records'])
+        ->name('student.records');
+
+    Route::get('/student/status', [PortalController::class, 'checkStatus'])
+        ->name('student.status');
+
+    Route::patch('/student/profile/photo', [PortalController::class, 'updatePhoto'])
+        ->middleware('throttle:6,1')
+        ->name('student.profile.photo');
+
+    Route::get('/student/profile/photo', [PortalController::class, 'photo'])
+        ->name('student.profile.photo.show');
+});
+
+// ============================================================================
+// ADMIN / STAFF ROUTES (Protected by default 'web' Guard)
 // ============================================================================
 Route::middleware('auth')->group(function (): void {
     
-    // Dashboard
-   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Admin Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Quick Patient Search
     Route::get('/clinic/search', [StudentController::class, 'searchPatient'])
@@ -79,10 +120,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/medical-excuses/{medicalExcuse}', [MedicalExcuseController::class, 'show'])
         ->name('medical-excuses.show');
 
-    // Student Portal Status Check (ISA LANG NA TO!)
-    Route::get('/student/status', [PortalController::class, 'checkStatus'])
-        ->name('student.status');
-
-    // Logout
+    // Logout (Shared for both Admin and Student)
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 });
