@@ -6,29 +6,30 @@ use App\Http\Controllers\Controller;
 use App\Models\ClinicVisit;
 use App\Models\MedicalProfile;
 use App\Models\Student;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function index(): View
     {
-        // 1. Total Active Students
         $totalStudents = Student::query()
-            ->where('status', 'active')
+            ->where('is_active', true)
             ->count();
 
-        // 2. Visits Today
         $visitsToday = ClinicVisit::query()
             ->whereDate('visited_at', today())
             ->count();
 
-        // 3. Students with Allergies
-        $studentsWithAllergies = MedicalProfile::query()
-            ->where('allergy_status', 'has_allergies')
+        $studentsWithAllergies = Student::query()
+            ->whereIn(
+                'id',
+                MedicalProfile::query()
+                    ->select('student_id')
+                    ->where('allergy_status', 'has_allergies')
+            )
             ->count();
 
-        // 4. Special Conditions
         $specialConditions = MedicalProfile::query()
             ->whereNotNull('existing_conditions')
             ->whereRaw("TRIM(existing_conditions) <> ''")
@@ -37,48 +38,64 @@ class DashboardController extends Controller
             )
             ->count();
 
-        // 5. Course Distribution (DISABLED: No 'course' column in DB yet)
-        // Kung gusto mong gamitin ito, kailangan mo munang mag-add ng 'course' column via migration
-        $courseLabels = []; 
-        $courseData = [];
-
-        /* 
         $studentsByCourse = Student::query()
-            ->select('course', DB::raw('COUNT(*) as total'))
-            ->where('status', 'active')
+            ->selectRaw('course, COUNT(*) AS total')
+            ->where('is_active', true)
             ->whereNotNull('course')
             ->groupBy('course')
-            ->orderBy('total', 'desc')
+            ->orderBy('course')
             ->get();
 
-        $courseLabels = $studentsByCourse->pluck('course')->values();
-        $courseData = $studentsByCourse->pluck('total')->values();
-        */
-
-        // 6. Pending Approvals Count & List
         $pendingApprovalsCount = Student::query()
-            ->where('status', 'pending')
+            ->where('is_approved', false)
             ->count();
 
         $pendingStudents = Student::query()
-            ->where('status', 'pending')
+            ->where('is_approved', false)
             ->latest('created_at')
             ->take(5)
-            ->get(['id', 'name', 'full_name', 'student_number', 'created_at']);
+            ->get([
+                'id',
+                'unique_id',
+                'full_name',
+                'student_number',
+                'created_at',
+            ]);
 
         return view('dashboard', [
             'totalStudents' => $totalStudents,
             'visitsToday' => $visitsToday,
             'studentsWithAllergies' => $studentsWithAllergies,
             'specialConditions' => $specialConditions,
-            
-            // Chart Data (Empty arrays for now)
-            'courseLabels' => $courseLabels,
-            'courseData' => $courseData,
-            
-            // Pending Approvals Data
+            'courseLabels' => $studentsByCourse->pluck('course')->values(),
+            'courseData' => $studentsByCourse->pluck('total')->values(),
             'pendingApprovalsCount' => $pendingApprovalsCount,
             'pendingStudents' => $pendingStudents,
+        ]);
+    }
+
+    public function allergies(): View|RedirectResponse
+    {
+        $query = Student::query()
+            ->whereIn(
+                'id',
+                MedicalProfile::query()
+                    ->select('student_id')
+                    ->where('allergy_status', 'has_allergies')
+            )
+            ->orderBy('full_name')
+            ->orderBy('id');
+
+        if ((clone $query)->count() === 1) {
+            $student = (clone $query)->first();
+
+            if ($student) {
+                return redirect()->route('students.show', $student);
+            }
+        }
+
+        return view('admin.allergies', [
+            'students' => $query->paginate(15),
         ]);
     }
 }
