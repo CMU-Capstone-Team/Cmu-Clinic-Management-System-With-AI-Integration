@@ -24,14 +24,7 @@
         <div class="border-b border-slate-200 p-6">
             <form method="GET" action="{{ route('students.index') }}" class="flex flex-wrap gap-3">
                 
-                {{-- Status Filter Dropdown --}}
-                <select name="status" 
-                        class="rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-blue-600 min-w-[160px]">
-                    <option value="">All Statuses</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending Approval</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                </select>
+
 
                 {{-- Search Input --}}
                 <input type="search" name="search" value="{{ $search }}"
@@ -43,7 +36,7 @@
                     Search
                 </button>
 
-                @if ($search !== '' || request('status'))
+                @if ($search !== '')
                     <a href="{{ route('students.index') }}"
                        class="rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
                         Clear
@@ -56,10 +49,10 @@
             <div class="px-6 py-16 text-center">
                 <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-500">?</div>
                 <h2 class="mt-4 text-lg font-semibold">
-                    {{ $search !== '' || request('status') ? 'No matching students found' : 'No student records yet' }}
+                    {{ $search !== '' ? 'No matching students found' : 'No student records yet' }}
                 </h2>
                 <p class="mt-1 text-sm text-slate-500">
-                    {{ $search !== '' || request('status') ? 'Try adjusting your filters.' : 'Register the first student to begin.' }}
+                    {{ $search !== '' ? 'Try adjusting your filters.' : 'Register the first student to begin.' }}
                 </p>
             </div>
         @else
@@ -109,38 +102,17 @@
                                         $badgeClass = $statusColors[$student->status] ?? 'bg-slate-100 text-slate-600';
                                     @endphp
                                     <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $badgeClass }}">
-                                        {{ ucfirst($student->status) }}
+                                        {{ $student->status === 'rejected' ? 'Disabled' : ($student->email_verified_at ? 'Verified' : 'Email unverified') }}
                                     </span>
                                 </td>
 
                                 {{-- Actions Column --}}
                                 <td class="px-6 py-4 text-right space-x-2">
-                                    @if($student->status === 'pending')
-                                        {{-- APPROVE BUTTON --}}
-                                        <form action="{{ route('students.approve', $student->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" onclick="return confirm('Approve this student registration?')"
-                                                    class="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 transition">
-                                                Approve
-                                            </button>
-                                        </form>
 
-                                        {{-- REJECT BUTTON --}}
-                                        <form action="{{ route('students.reject', $student->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" onclick="return confirm('Reject this student registration?')"
-                                                    class="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 transition">
-                                                Reject
-                                            </button>
-                                        </form>
-                                    @else
                                         <a href="{{ route('students.show', $student->id) }}"
                                            class="text-sm font-semibold text-blue-800 hover:text-blue-600">
                                             View Profile
                                         </a>
-                                    @endif
                                 </td>
                             </tr>
                         @endforeach

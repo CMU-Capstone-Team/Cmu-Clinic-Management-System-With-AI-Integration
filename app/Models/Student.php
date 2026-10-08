@@ -13,11 +13,12 @@ class Student extends Authenticatable // ✅ BAGUHIN MULA 'Model' PAPUNTA 'Authe
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'student_number',
         'full_name',     // ✅ IDAGDAG (Base sa migration)
         'email',
         'password',      // ✅ IDAGDAG (Kailangan para sa login/auth)
-        'status',        // ✅ PINAKA-IMPORTANT: Para sa pending/active/rejected workflow
+        'status',        // Legacy status retained for compatibility.
         
         // Existing fields mo
         'first_name',

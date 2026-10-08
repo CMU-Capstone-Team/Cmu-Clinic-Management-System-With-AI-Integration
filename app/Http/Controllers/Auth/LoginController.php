@@ -24,29 +24,26 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        // 1. CHECK STUDENT TABLE FIRST
-        $student = Student::where('email', $credentials['email'])->first();
-
-        if ($student && Hash::check($credentials['password'], $student->password)) {
-            // Password matched! Check Status now.
-            if ($student->status === 'pending') {
-                return back()->withErrors(['email' => 'Your account is pending approval. Please wait for admin verification.']);
-            }
-            
-            if ($student->status === 'rejected') {
-                return back()->withErrors(['email' => 'Your registration has been rejected. Contact the clinic for details.']);
-            }
-
-            // If Active, Login as Student
-            // ⚠️ WARNING: Mag-e-error ito kung wala pang 'student' guard sa config/auth.php
-            auth()->guard('student')->login($student); 
-            return redirect()->route('student.dashboard'); 
-        }
-
-        // 2. IF NOT STUDENT, CHECK ADMIN (USERS TABLE)
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $email = strtolower(trim($credentials['email']));
+        $credentials['email'] = $email;
+        // Staff login is independent of student email verification.
+        if (Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
+        }
+        $student = Student::whereRaw('LOWER(email) = ?', [$email])->first();
+        if ($student && Hash::check($credentials['password'], $student->password ?? '')) {
+            if ($student->status === 'rejected') {
+                return back()->withErrors(['email' => 'This account is disabled. Please contact the clinic.']);
+            }
+            if (!$student->email_verified_at || $student->status !== 'active') {
+                $token = app(\App\Services\StudentEmailOtp::class)->start($email, ['student_id' => $student->id]);
+                $request->session()->put('student_otp', ['email' => $email, 'token' => $token]);
+                return redirect()->route('student.otp.show')->with('status', 'Please verify your email to continue.');
+            }
+            Auth::guard('student')->login($student);
+            $request->session()->regenerate();
+            return redirect()->route('student.dashboard');
         }
 
         // 3. INVALID CREDENTIALS
@@ -57,7 +54,7 @@ class LoginController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
