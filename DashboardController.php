@@ -2,31 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\ClinicVisit;
 use App\Models\MedicalProfile;
 use App\Models\Student;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function index(): View
     {
-        // 1. Total Active Students
         $totalStudents = Student::query()
             ->where('is_active', true)
             ->count();
 
-        // 2. Visits Today
         $visitsToday = ClinicVisit::query()
             ->whereDate('visited_at', today())
             ->count();
 
-        // 3. Students with Allergies
-        $studentsWithAllergies = MedicalProfile::query()
-            ->where('allergy_status', 'has_allergies')
+        $studentsWithAllergies = Student::query()
+            ->whereIn(
+                'id',
+                MedicalProfile::query()
+                    ->select('student_id')
+                    ->where('allergy_status', 'has_allergies')
+            )
             ->count();
 
-        // 4. Special Conditions
         $specialConditions = MedicalProfile::query()
             ->whereNotNull('existing_conditions')
             ->whereRaw("TRIM(existing_conditions) <> ''")
@@ -35,7 +38,6 @@ class DashboardController extends Controller
             )
             ->count();
 
-        // 5. Course Distribution (for chart)
         $studentsByCourse = Student::query()
             ->selectRaw('course, COUNT(*) AS total')
             ->where('is_active', true)
@@ -44,16 +46,21 @@ class DashboardController extends Controller
             ->orderBy('course')
             ->get();
 
-        // NEW: Pending Approvals Count & List
         $pendingApprovalsCount = Student::query()
-            ->where('is_approved', false) // Adjust column name if different
+            ->where('is_approved', false)
             ->count();
 
         $pendingStudents = Student::query()
             ->where('is_approved', false)
             ->latest('created_at')
-            ->take(5) // Show latest 5 pending
-            ->get(['id', 'unique_id', 'full_name', 'student_number', 'created_at']);
+            ->take(5)
+            ->get([
+                'id',
+                'unique_id',
+                'full_name',
+                'student_number',
+                'created_at',
+            ]);
 
         return view('dashboard', [
             'totalStudents' => $totalStudents,
@@ -62,10 +69,33 @@ class DashboardController extends Controller
             'specialConditions' => $specialConditions,
             'courseLabels' => $studentsByCourse->pluck('course')->values(),
             'courseData' => $studentsByCourse->pluck('total')->values(),
-            
-            // New variables for blade
             'pendingApprovalsCount' => $pendingApprovalsCount,
             'pendingStudents' => $pendingStudents,
+        ]);
+    }
+
+    public function allergies(): View|RedirectResponse
+    {
+        $query = Student::query()
+            ->whereIn(
+                'id',
+                MedicalProfile::query()
+                    ->select('student_id')
+                    ->where('allergy_status', 'has_allergies')
+            )
+            ->orderBy('full_name')
+            ->orderBy('id');
+
+        if ((clone $query)->count() === 1) {
+            $student = (clone $query)->first();
+
+            if ($student) {
+                return redirect()->route('students.show', $student);
+            }
+        }
+
+        return view('admin.allergies', [
+            'students' => $query->paginate(15),
         ]);
     }
 }

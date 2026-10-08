@@ -11,11 +11,17 @@ class MedicalProfile extends Model
 
     protected $fillable = [
         'student_id',
+        'blood_type',
         'allergy_status',
+        'allergies',
+        'current_medications',
         'existing_conditions',
+        'past_surgeries',
+        'family_medical_history',
+        'immunization_notes',
+        'additional_notes',
     ];
 
-    // Relationship to Student
     public function student()
     {
         return $this->belongsTo(Student::class);

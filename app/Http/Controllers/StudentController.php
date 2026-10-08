@@ -13,19 +13,14 @@ class StudentController extends Controller
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
-        $statusFilter = $request->query('status'); // Para sa pending filter galing sa dashboard
 
         $students = Student::query()
-            ->when($statusFilter, function ($query) use ($statusFilter) {
-                $query->where('status', $statusFilter);
-            })
             ->when(
                 $search !== '',
                 function ($query) use ($search): void {
                     $query->where(function ($studentQuery) use ($search): void {
                         $studentQuery
                             ->where('student_number', 'like', "%{$search}%")
-                            ->orWhere('name', 'like', "%{$search}%")
                             ->orWhere('full_name', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     });
@@ -38,7 +33,6 @@ class StudentController extends Controller
         return view('students.index', [
             'students' => $students,
             'search' => $search,
-            'statusFilter' => $statusFilter,
         ]);
     }
 
@@ -53,7 +47,7 @@ class StudentController extends Controller
             'student_number' => 'required|string|unique:students,student_number',
             'name' => 'required|string|max:255',
             'full_name' => 'nullable|string|max:255',
-            'email' => 'required|email|unique:students,email',
+            'email' => ['required', 'email', 'unique:students,email'],
             'password' => 'required|min:8|confirmed',
             'course' => 'nullable|string|max:255',
             'year_level' => 'nullable|integer',
@@ -66,7 +60,11 @@ class StudentController extends Controller
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
-        $validated['status'] = 'pending'; // Default status for admin-created students
+        $validated['status'] = 'active';
+        $validated['full_name'] = $validated['full_name'] ?? $validated['name'];
+        $validated['email'] = strtolower($validated['email']);
+        // Staff may create a clinic record; portal access still requires email OTP.
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('students', 'name')) unset($validated['name']);
 
         $student = Student::create($validated);
 
@@ -87,34 +85,6 @@ class StudentController extends Controller
     }
 
     /**
-     * APPROVE a pending student registration
-     */
-    public function approve(Student $student): RedirectResponse
-    {
-        if ($student->status === 'active') {
-            return back()->with('error', 'Student is already approved.');
-        }
-
-        $student->update(['status' => 'active']);
-
-        return back()->with('success', 'Student has been approved successfully!');
-    }
-
-    /**
-     * REJECT a pending student registration
-     */
-    public function reject(Student $student): RedirectResponse
-    {
-        if ($student->status === 'rejected') {
-            return back()->with('error', 'Student is already rejected.');
-        }
-
-        $student->update(['status' => 'rejected']);
-
-        return back()->with('error', 'Student registration has been rejected.');
-    }
-
-    /**
      * Search Patient by Unique ID for Quick Check-in
      */
     public function searchPatient(Request $request): RedirectResponse
@@ -127,7 +97,7 @@ class StudentController extends Controller
         $student = Student::where('student_number', $request->unique_id)->first();
 
         if (!$student || $student->status !== 'active') {
-            return back()->with('error', 'Student not found or registration is still pending approval.');
+            return back()->with('error', 'Student not found or account is inactive.');
         }
 
         return redirect()->route('clinic-visits.create', ['student' => $student->id]);

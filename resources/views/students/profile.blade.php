@@ -53,7 +53,7 @@
         margin: 0 0 8px;
         color: #172b48;
         font-size: clamp(28px, 2.4vw, 36px);
-        font-weight: 750;
+        font-weight: 700;
         letter-spacing: -1px;
         line-height: 1.2;
     }
@@ -136,7 +136,7 @@
         place-items: center;
         height: 100%;
         font-size: 58px;
-        font-weight: 650;
+        font-weight: 600;
     }
     .mp-camera {
         position: absolute;
@@ -271,7 +271,7 @@
         background: transparent;
         color: #53667e;
         font-size: 13px !important;
-        font-weight: 650 !important;
+        font-weight: 600 !important;
         line-height: 1.4;
         transition: background .18s ease, color .18s ease;
     }
@@ -524,6 +524,142 @@
             transition: none !important;
         }
     }
+
+    .mp-personal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 26px; }
+    .mp-personal-field { min-width: 0; }
+    .mp-personal-field > label, .mp-personal-field > .mp-field-label { display: block; margin-bottom: 8px; color: #5b6e85; font-size: 12px; font-weight: 600; }
+    .mp-personal-field input, .mp-personal-field select {
+        width: 100%; min-width: 0; height: 50px; padding: 0 14px; border: 1px solid #dbe4ef;
+        border-radius: 10px; background: #fff; color: var(--ink); font: inherit; font-size: 14px;
+    }
+    .mp-personal-field input[readonly] { background: #f7f9fc; color: #4c617a; }
+    .mp-personal-field input:focus, .mp-personal-field select:focus { outline: 2px solid #6585e5; outline-offset: 1px; }
+    .mp-personal-field input::placeholder { color: #75849a; }
+    .mp-personal-field-wide { grid-column: 1 / -1; }
+    .mp-personal-actions { display: flex; justify-content: flex-end; margin-top: 24px; }
+    @media (max-width: 600px) { .mp-personal-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; } }
+
+    /* Visual refinement; existing form layout and behavior are retained. */
+    .mp {
+        --ink: #20334d;
+        --muted: #65758a;
+        --line: #e3e9f1;
+        --blue: #2e5bd4;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+    .mp-heading h1 {
+        color: #182e4b;
+        font-weight: 700;
+        letter-spacing: -.9px;
+    }
+    .mp-heading p { color: #66778d; font-size: 13px; }
+    .mp-card {
+        border-color: #e2e8f0;
+        border-radius: 18px;
+        box-shadow: 0 2px 4px rgba(24,46,75,.025), 0 12px 32px rgba(24,46,75,.045);
+    }
+    .mp-hero {
+        background: linear-gradient(155deg, #24486f 0%, #1d3b60 52%, #182f4e 100%);
+        border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .mp-kicker { color: #c4d5ec; font-size: 10px; letter-spacing: 1.65px; }
+    .mp-photo-trigger {
+        border: 4px solid #eef3fa;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.22), 0 9px 24px rgba(7,24,47,.2);
+    }
+    .mp-photo-trigger:hover {
+        box-shadow: 0 0 0 5px rgba(255,255,255,.09), 0 10px 26px rgba(7,24,47,.22);
+    }
+    .mp-camera { width: 36px; height: 36px; border-color: #1c3a5e; color: #2e5bd4; }
+    .mp-name { font-size: 24px; font-weight: 600; letter-spacing: -.45px; }
+    .mp-number { color: #d3e0f1; font-size: 13px; }
+    .mp-status { padding: 6px 13px; font-size: 12px; font-weight: 600; }
+    .mp-status.active { background: #e5f6ed; color: #176745; }
+    .mp-summary { padding: 26px 24px; background: #fff; }
+    .mp-summary-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #718097; }
+    .mp-summary-email { font-size: 13px; font-weight: 500; color: #2d4563; }
+    .mp-summary-note { color: #6b7c92; font-size: 12px; border-color: #e7ecf3; }
+    .mp-tabs { background: #e7edf5; border-color: #dde5ef; padding: 5px; border-radius: 12px; gap: 4px; }
+    .mp-tab { font-weight: 600 !important; color: #53647b; border-radius: 8px; }
+    .mp-tab:hover { color: #244ebc; background: rgba(255,255,255,.45); }
+    .mp-tab[aria-selected="true"] {
+        color: #244ebc;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(24,46,75,.07), 0 3px 8px rgba(24,46,75,.035);
+    }
+    .mp-section-heading { padding-bottom: 21px; border-bottom: 1px solid #edf1f6; margin-bottom: 25px; }
+    .mp-section h2 { color: #1c304b; font-size: 20px; font-weight: 600; letter-spacing: -.4px; }
+    .mp-section-heading p { color: #6c7d91; font-size: 12px; }
+    .mp-icon { background: #eef3ff; color: #345dd1; border: 1px solid #e5ecff; border-radius: 12px; }
+    .mp-personal-grid { gap: 24px 26px; }
+    .mp-personal-field > label, .mp-field label { color: #4b5e76; font-size: 12px; font-weight: 600; margin-bottom: 9px; }
+    .mp-personal-field input, .mp-personal-field select, .mp-field input {
+        height: 50px;
+        border: 1px solid #dce4ef;
+        border-radius: 9px;
+        padding: 0 14px;
+        color: #233b58;
+        background: #fff;
+        font-size: 14px;
+        line-height: normal;
+        box-shadow: 0 1px 2px rgba(24,46,75,.025);
+        transition: border-color .16s ease, box-shadow .16s ease;
+    }
+    .mp-personal-field input[readonly] { color: #53667f; background: #f5f7fb; border-color: #e3e9f2; box-shadow: none; }
+    .mp-personal-field input:not([readonly]):hover, .mp-personal-field select:hover, .mp-field input:hover { border-color: #b8c8e1; }
+    .mp-personal-field input:focus, .mp-personal-field select:focus, .mp-field input:focus {
+        outline: none;
+        border-color: #4c75db;
+        box-shadow: 0 0 0 3px rgba(46,91,212,.10);
+    }
+    .mp-personal-field input::placeholder, .mp-field input::placeholder { color: #8592a4; }
+    .mp-password-wrap input { padding-right: 65px; }
+    .mp-personal-actions { margin-top: 25px; }
+    .mp-submit {
+        background: #2e58cf;
+        border: 1px solid #2950c1;
+        border-radius: 9px;
+        min-height: 46px;
+        padding: 12px 20px;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 4px rgba(37,72,169,.12);
+        transition: background .16s ease, box-shadow .16s ease;
+    }
+    .mp-submit:hover { background: #264cbc; box-shadow: 0 3px 8px rgba(37,72,169,.17); }
+    .mp-submit:active { background: #2244aa; }
+    .mp-submit:focus-visible { outline: 3px solid #a8bdf5; outline-offset: 3px; }
+    .mp-information-note { border-color: #e8edf4; color: #728196; font-size: 12px; line-height: 1.75; }
+    .mp-alert { border-radius: 9px; }
+    @media (max-width: 600px) {
+        .mp-personal-grid { gap: 19px; }
+        .mp-section-heading { padding-bottom: 18px; margin-bottom: 21px; }
+        .mp-section h2 { font-size: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .mp input, .mp select, .mp button { transition: none !important; }
+    }
+
+    /* Match the supplied admin dashboard's type scale and font families. */
+    .mp-heading h1 {
+        font-family: 'Inter', sans-serif;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 36px;
+        letter-spacing: normal;
+    }
+    .mp-heading p { font-size: 16px; font-weight: 400; line-height: 24px; }
+    .mp-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; }
+    .mp-initial { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
+    .mp-section h2 { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; line-height: 24px; letter-spacing: normal; }
+    .mp-section-heading p { font-size: 12px; font-weight: 400; line-height: 16px; }
+    .mp-personal-field > label, .mp-field label { font-size: 12px; font-weight: 500; line-height: 16px; }
+    .mp input, .mp select, .mp button { font-family: 'Inter', sans-serif; }
+    .mp-personal-field input, .mp-personal-field select, .mp-field input { font-size: 14px; font-weight: 400; }
+    .mp-tab { font-size: 14px !important; font-weight: 500 !important; line-height: 20px; }
+    .mp-submit { font-size: 14px !important; font-weight: 500 !important; line-height: 20px; }
+    @media (max-width: 540px) { .mp-tab { font-size: 12px !important; } }
 </style>
 @endpush
 @section('content')
@@ -538,28 +674,7 @@
     $validBirthday = $birthday && !$birthday->isFuture();
     $accountTab = $errors->emailUpdate->any()
         || $errors->passwordUpdate->any();
-    $personalDetails = [
-        ['Full name', $student->full_name, true],
-        ['Student number', $student->student_number, false],
-        [
-            'Gender',
-            filled($student->sex) ? ucfirst($student->sex) : null,
-            false
-        ],
-        [
-            'Birthday',
-            $validBirthday ? $birthday->format('F j, Y') : null,
-            false
-        ],
-        [
-            'Age',
-            $validBirthday ? $birthday->age . ' years old' : null,
-            false
-        ],
-        ['Contact number', $student->contact_number, false],
-        ['Email address', $student->email, false],
-        ['Address', $student->address, true],
-    ];
+
 ?>
 <div
     class="mp"
@@ -750,19 +865,67 @@
                         <p>Your student details on record with the clinic.</p>
                     </div>
                 </div>
-                <dl class="mp-details">
-                    @foreach ($personalDetails as $detail)
-                        <div class="mp-detail {{ $detail[2] ? 'mp-detail-wide' : '' }}">
-                            <dt>{{ $detail[0] }}</dt>
-                            <dd class="{{ blank($detail[1]) ? 'is-empty' : '' }}">
-                                {{ filled($detail[1]) ? $detail[1] : 'Not provided' }}
-                            </dd>
+                @if ($errors->academicUpdate->any())
+                    <div class="mp-alert mp-error" role="alert">
+                        @foreach ($errors->academicUpdate->all() as $message)
+                            <div>{{ $message }}</div>
+                        @endforeach
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('student.profile.academic') }}">
+                    @csrf
+                    @method('PATCH')
+                    <div class="mp-personal-grid">
+                        <div class="mp-personal-field">
+                            <label for="mp-full-name">Full name</label>
+                            <input id="mp-full-name" value="{{ $student->full_name }}" readonly>
                         </div>
-                    @endforeach
-                </dl>
+                        <div class="mp-personal-field">
+                            <label for="mp-personal-email">Email address</label>
+                            <input id="mp-personal-email" value="{{ $student->email }}" readonly>
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-student-number">Student number</label>
+                            <input id="mp-student-number" value="{{ $student->student_number }}" readonly>
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-year-section">Year &amp; Section</label>
+                            <input id="mp-year-section" name="year_section" type="text" maxlength="80" required
+                                value="{{ old('year_section', collect([$student->course, collect([$student->year_level, $student->section])->filter(fn ($value) => filled($value))->implode('')])->filter(fn ($value) => filled($value))->implode(' - ')) }}"
+                                placeholder="e.g. BSIT - 3D">
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-sex">Gender</label>
+                            <select id="mp-sex" name="sex">
+                                <option value="">Select gender</option>
+                                @foreach (['male' => 'Male', 'female' => 'Female'] as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('sex', $student->sex) === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-birth-date">Birthday</label>
+                            <input id="mp-birth-date" name="birth_date" type="date" max="{{ now()->toDateString() }}" autocomplete="bday"
+                                value="{{ old('birth_date', $student->birth_date?->format('Y-m-d')) }}">
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-contact">Contact number</label>
+                            <input id="mp-contact" name="contact_number" type="tel" autocomplete="tel" maxlength="20"
+                                value="{{ old('contact_number', $student->contact_number) }}" placeholder="Enter contact number">
+                        </div>
+                        <div class="mp-personal-field">
+                            <label for="mp-address">Address</label>
+                            <input id="mp-address" name="address" maxlength="500" autocomplete="street-address"
+                                value="{{ old('address', $student->address) }}" placeholder="Enter your address">
+                        </div>
+                    </div>
+                    <div class="mp-personal-actions">
+                        <button type="submit" class="mp-submit">Save Personal Information</button>
+                    </div>
+                </form>
                 <p class="mp-information-note">
-                    Need to correct your personal details? Contact the clinic
-                    staff to update your student record.
+                    Saved personal information is also available to clinic staff.
+                    Change your email in the Email &amp; Password tab.
                 </p>
             </section>
             <div

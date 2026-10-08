@@ -42,7 +42,7 @@
                     <div class="notice" role="status">{{ session('status') }}</div>
                 @endif
                 
-                @if ($errors->any() && !request()->is('login*screen=register')) 
+                @if ($errors->any() && !old('student_number')) 
                     {{-- Show errors only if not on register tab --}}
                     <div class="notice bad" role="alert">
                         <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
@@ -72,16 +72,16 @@
             <!-- ✅ REGISTER FORM CONTAINER (Hidden initially) -->
             <div id="container-register" style="display: none;">
                 <h1>Student pre-registration</h1>
-                <p class="intro">Get started with your CMU Alaga student account.</p>
+                <p class="intro">Use an email address you can access. We will send a code to verify it.</p>
                 
-                @if ($errors->any() && request()->is('login*screen=register'))
+                @if ($errors->any() && old('student_number'))
                     <div class="notice bad" role="alert" tabindex="-1" id="error-summary">
                         <strong>Please check the following:</strong>
                         <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('pre-register.store') }}" class="form" data-busy="Creating account…">
+                <form method="POST" action="{{ route('pre-register.store') }}" class="form" data-busy="Sending code…">
                     @csrf
                     
                     <div class="field">
@@ -97,16 +97,16 @@
                     </div>
 
                     <div class="field">
-                        <label for="email">Email address</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username" placeholder="you@example.com">
+                        <label for="register-email">Email address</label>
+                        <input id="register-email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username" placeholder="you@gmail.com">
                         @error('email')<p class="error">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="field">
-                        <label for="password">Password</label>
+                        <label for="register-password">Password</label>
                         <div class="password-wrap">
-                            <input id="password" name="password" type="password" required autocomplete="new-password" placeholder="At least 8 characters" minlength="8">
-                            <button class="reveal" type="button" data-password-toggle="password">Show</button>
+                            <input id="register-password" name="password" type="password" required autocomplete="new-password" placeholder="At least 8 characters" minlength="8">
+                            <button class="reveal" type="button" data-password-toggle="register-password">Show</button>
                         </div>
                         @error('password')<p class="error">{{ $message }}</p>@enderror
                     </div>
@@ -121,7 +121,7 @@
                     </div>
 
                     <button type="submit" class="primary">
-                        Create student account
+                        Send verification code
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>
                     </button>
                 </form>
